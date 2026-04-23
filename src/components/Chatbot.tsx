@@ -291,7 +291,11 @@ ${targetStage.riddle}`
     const normalizedUserAnswer = userInput.trim().toLowerCase()
     const normalizedCorrectAnswer = targetStage.answer.toLowerCase()
 
-    if (normalizedUserAnswer === normalizedCorrectAnswer) {
+    const isOshmyanyMuseumStage = !isSapiegaTour && currentStage === 4
+    const isOshmyanyMuseumAnswerOk =
+      isOshmyanyMuseumStage && (normalizedUserAnswer === 'умерлі' || normalizedUserAnswer === 'умерли')
+
+    if (normalizedUserAnswer === normalizedCorrectAnswer || isOshmyanyMuseumAnswerOk) {
       // Генерируем кодовый фрагмент
       const codeFragment = isSapiegaTour
         ? (currentStage === 1 ? '2' :
