@@ -187,6 +187,47 @@ export default function Chatbot() {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    const selectedTour = localStorage.getItem('selectedTour')
+    if (!selectedTour) return
+    if (selectedTour !== 'sapieha-seal' && selectedTour !== 'oshmyany-city') return
+
+    const raw = localStorage.getItem(`${selectedTour}-botProgress`)
+    if (!raw) return
+
+    try {
+      const saved = JSON.parse(raw) as {
+        currentStage?: number
+        collectedCode?: string[]
+      }
+
+      const restoredStage = typeof saved.currentStage === 'number' ? saved.currentStage : 0
+      const restoredCode = Array.isArray(saved.collectedCode) ? saved.collectedCode : []
+
+      if (restoredStage >= 1) {
+        setQuestStarted(true)
+        setCurrentStage(restoredStage)
+        setCollectedCode(restoredCode)
+
+        const restoreText = restoredStage <= (selectedTour === 'sapieha-seal' ? questStages.length : questStagesOshmyany.length)
+          ? `🔁 Я нашёл твой прогресс и готов продолжать с этапа ${restoredStage}. Нажми «Я на месте», когда будешь у текущей локации.`
+          : '🏁 Похоже, этот тур уже завершён. Хочешь пройти ещё раз — нажми «Начать квест». '
+
+        const restoreMessage: Message = {
+          id: `restore-${Date.now()}`,
+          text: restoreText,
+          isBot: true,
+          timestamp: new Date(),
+          displayedText: restoreText,
+          isTyping: false,
+        }
+        setMessages([restoreMessage])
+      }
+    } catch {
+      return
+    }
+  }, [])
+
   const addMessage = (text: string, isBot: boolean = true, type?: Message['type']) => {
     const message: Message = {
       id: Date.now().toString(),
@@ -312,7 +353,8 @@ ${targetStage.riddle}`
            currentStage === 6 ? 'Ключ-6' :
            currentStage === 7 ? 'Ключ-7' : '')
 
-      setCollectedCode(prev => [...prev, codeFragment])
+      const nextCollectedCode = [...collectedCode, codeFragment]
+      setCollectedCode(nextCollectedCode)
 
       const fragmentMessage = isSapiegaTour 
         ? (currentStage === 1 ? `Первая цифра кода — ${codeFragment}` :
@@ -336,7 +378,7 @@ ${targetStage.riddle}`
 
           const botProgress = {
             currentStage: currentStage + 1,
-            collectedCode,
+            collectedCode: nextCollectedCode,
             unlockedMarkers: tourPlaceOrder.slice(0, currentStage + 1),
             newlyUnlocked: tourPlaceOrder[currentStage] || null,
           }
@@ -347,7 +389,7 @@ ${targetStage.riddle}`
         }, 2000)
       } else {
         // Quest completed
-        const finalCode = collectedCode.join('-')
+        const finalCode = nextCollectedCode.join('-')
         const completionMessage = isSapiegaTour 
           ? `🏆 ПОЗДРАВЛЯЮ! Печать Сапег восстановлена!
 
@@ -365,7 +407,7 @@ ${targetStage.riddle}`
         // Сохраняем финальный прогресс
         const botProgress = {
           currentStage: totalStages + 1,
-          collectedCode,
+          collectedCode: nextCollectedCode,
           unlockedMarkers: (getTourById(selectedTour || '') || getDefaultTour()).places,
           newlyUnlocked: null,
         }
