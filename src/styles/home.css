@@ -192,6 +192,66 @@
   margin-right: auto;
 }
 
+/* Поле ввода имени */
+.home__name-input {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.home__name-field {
+  padding: 14px 20px;
+  font-size: 16px;
+  border: 2px solid rgba(255, 210, 74, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  outline: none;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.home__name-field::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.home__name-field:focus {
+  border-color: #ffd24a;
+  box-shadow: 0 0 20px rgba(255, 210, 74, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.home__name-submit {
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffd24a 0%, #ffb703 50%, #ff6b35 100%);
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(255, 210, 74, 0.3);
+}
+
+.home__name-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 210, 74, 0.4);
+}
+
+.home__name-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.home__name-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Статистика прогресса */
 .home__stats {
   display: flex;

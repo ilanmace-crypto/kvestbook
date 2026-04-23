@@ -14,6 +14,8 @@ export default function HomePage() {
   const navigate = useNavigate()
   const [isLoaded, setIsLoaded] = useState(false)
   const [progress, setProgress] = useState<Progress>({ unlocked: ['1'], completed: [], attempts: {} })
+  const [userName, setUserName] = useState('')
+  const [nameSaved, setNameSaved] = useState(false)
 
   useEffect(() => {
     setIsLoaded(true)
@@ -31,10 +33,23 @@ export default function HomePage() {
         // ignore
       }
     }
+
+    const savedName = localStorage.getItem('userName')
+    if (savedName) {
+      setUserName(savedName)
+      setNameSaved(true)
+    }
   }, [])
 
   const handleStart = () => {
     navigate('/tours')
+  }
+
+  const handleNameSubmit = () => {
+    if (userName.trim()) {
+      localStorage.setItem('userName', userName.trim())
+      setNameSaved(true)
+    }
   }
 
   const completedCount = progress.completed.length
@@ -76,10 +91,30 @@ export default function HomePage() {
           </h1>
 
           <p className="home__subtitle animate-fade-in">
-            Откройте тайны древнего города через увлекательное путешествие. 
-            Исследуйте достопримечательности, решайте загадки и узнавайте 
+            Откройте тайны древнего города через увлекательное путешествие.
+            Исследуйте достопримечательности, решайте загадки и узнавайте
             историю Ошмян в игровом формате.
           </p>
+
+          {!nameSaved && (
+            <div className="home__name-input animate-fade-in">
+              <input
+                type="text"
+                placeholder="Введите ваше имя"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="home__name-field"
+                maxLength={30}
+              />
+              <button
+                onClick={handleNameSubmit}
+                className="home__name-submit"
+                disabled={!userName.trim()}
+              >
+                Сохранить
+              </button>
+            </div>
+          )}
 
           <div className="home__stats animate-fade-in">
             <div className="home__stat">

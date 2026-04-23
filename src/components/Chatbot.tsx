@@ -188,12 +188,30 @@ export default function Chatbot() {
   }, [messages])
 
   useEffect(() => {
+    const savedName = localStorage.getItem('userName')
+
     const selectedTour = localStorage.getItem('selectedTour')
     if (!selectedTour) return
     if (selectedTour !== 'sapieha-seal' && selectedTour !== 'oshmyany-city') return
 
     const raw = localStorage.getItem(`${selectedTour}-botProgress`)
-    if (!raw) return
+    if (!raw) {
+      // Если прогресса нет, отправляем приветствие с вопросом готовности
+      const welcomeText = savedName
+        ? `👋 Привет, ${savedName}! Добро пожаловать в квест «Ошмянские тайны»!\n\nГотов(а) начать приключение и раскрыть тайны древнего города?`
+        : '👋 Привет! Добро пожаловать в квест «Ошмянские тайны»!\n\nГотов(а) начать приключение и раскрыть тайны древнего города?'
+
+      const welcomeMessage: Message = {
+        id: `welcome-${Date.now()}`,
+        text: welcomeText,
+        isBot: true,
+        timestamp: new Date(),
+        displayedText: welcomeText,
+        isTyping: false,
+      }
+      setMessages([welcomeMessage])
+      return
+    }
 
     try {
       const saved = JSON.parse(raw) as {
@@ -210,8 +228,8 @@ export default function Chatbot() {
         setCollectedCode(restoredCode)
 
         const restoreText = restoredStage <= (selectedTour === 'sapieha-seal' ? questStages.length : questStagesOshmyany.length)
-          ? `🔁 Я нашёл твой прогресс и готов продолжать с этапа ${restoredStage}. Нажми «Я на месте», когда будешь у текущей локации.`
-          : '🏁 Похоже, этот тур уже завершён. Хочешь пройти ещё раз — нажми «Начать квест». '
+          ? `🔁 ${savedName ? `Привет, ${savedName}!` : 'Привет!'} Я нашёл твой прогресс и готов продолжать с этапа ${restoredStage}. Нажми «Я на месте», когда будешь у текущей локации.`
+          : `🏁 ${savedName ? `Привет, ${savedName}!` : 'Привет!'} Похоже, этот тур уже завершён. Хочешь пройти ещё раз — нажми «Начать квест». `
 
         const restoreMessage: Message = {
           id: `restore-${Date.now()}`,
