@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import '../styles/chatbot.css'
+import { getTourById, getDefaultTour } from '../data/tours'
 
 interface Message {
   id: string
@@ -92,80 +93,80 @@ const questStages: QuestStage[] = [
 const questStagesOshmyany: QuestStage[] = [
   {
     id: 1,
-    location: 'Костёл Святого Михаила',
-    riddle: `В храме высоком, где башни горят,
-Год окончания найди на вратах.
-Когда был построен сей дивный храм,
-В каком столетье возник его облик?`,
-    answer: '1906',
-    hint: 'Посмотри на бронзовую табличку справа от входа. Там написан год — 1906. Это начало XX века.',
+    location: 'Центральная площадь',
+    riddle: `На площади — следы былых времён,
+Но в шуме дней один фасад хранён.
+Найди дом, что на старом снимке есть,
+И на втором его ярусе — окон счесть.`,
+    answer: '8',
+    hint: 'Нужен дом, который узнаётся и на архивном фото, и сегодня. Считай окна именно на 2-м этаже (обычно одинаковые проёмы).',
     coordinates: { lat: 54.4149, lng: 25.9333 }
   },
   {
     id: 2,
-    location: 'Ошмянская синагога',
-    riddle: `В доме молитвы, где окна блестят,
-Шесть окон фасад украшают собой.
-Когда возвели этот храм для молитв,
-В каком веке он был построен людьми?`,
-    answer: '19',
-    hint: 'Ищи на информационном стенде. Это не XX век. Ответ — однозначное число.',
+    location: 'Костёл Святого Михаила',
+    riddle: `Две башни держат небо над землёй,
+В них ярусы стоят стеной.
+Взгляни на каждую, не спеши считать:
+Сколь уровней вверх она умеет держать?`,
+    answer: '3',
+    hint: 'Считай ярусы (визуальные «уровни» башни): отделяются карнизами/поясками. Нужна цифра для одной башни (они одинаковые).',
     coordinates: { lat: 54.4149, lng: 25.9333 }
   },
   {
     id: 3,
-    location: 'Руины францисканцев',
-    riddle: `В руинах древних, где францисканцы жили,
-Орден святой здесь основал свой приют.
-Когда появился монастырь сей святой,
-В каком столетье он встал на земле?`,
-    answer: '17',
-    hint: 'Ищи на исторической табличке. Монастырь древний. Ответ — однозначное число.',
+    location: 'Православная церковь',
+    riddle: `Через дорогу — иной язык небес,
+Купола как свечи, молчаливый лес.
+Не имя нужно — лишь счёт без суеты:
+Сколько «луковиц» над крышей видишь ты?`,
+    answer: '5',
+    hint: 'Считай именно купола-луковицы на крыше (не кресты и не маленькие декоративные элементы).',
     coordinates: { lat: 54.4149, lng: 25.9333 }
   },
   {
     id: 4,
-    location: 'Центральная площадь',
-    riddle: `На площади главной, где памятник стоит,
-Гранитные фигуры основателей ждут.
-Когда впервые город был упомянут,
-В каком году встал он на карты земли?`,
-    answer: '1387',
-    hint: 'Ищи на постаменте. Город впервые упомянут в XIV веке. Ответ — четырёхзначное число.',
+    location: 'Краеведческий музей',
+    riddle: `Здесь слова — как ключи, а память — как сталь,
+Но строка поэта скрывает печаль.
+Продолжи завет — и не ошибись:
+«Не пакідайце ж мовы нашай беларускай, каб не…»`,
+    answer: 'умерлі',
+    hint: 'Это цитата Франтишка Богушевича. Нужное слово — одно, по-белорусски.',
     coordinates: { lat: 54.4149, lng: 25.9333 }
   },
   {
     id: 5,
-    location: 'Православная церковь',
-    riddle: `В храме православном, где купола горят,
-Колокольня рядом возвышается гордо.
-Сколько куполов венчают сей храм,
-Сколько золотых глав сияют в вышине?`,
-    answer: '5',
-    hint: 'Посмотри на крышу. Куполов видно несколько. Ответ — однозначное число.',
+    location: 'Ошмянская синагога',
+    riddle: `Под сводами памяти — узор и круговерть,
+Знаки встают в ряд, как древняя тетрадь.
+Скажи мне число — без лишних слов:
+Сколько созвездий-символов держит её потолок?`,
+    answer: '12',
+    hint: 'Речь про знаки зодиака (их классическое количество). Если есть стенд/роспись — сверяйся с ним.',
     coordinates: { lat: 54.4149, lng: 25.9333 }
   },
   {
     id: 6,
-    location: 'Краеведческий музей',
-    riddle: `В доме истории, где память жива,
-Два этажа знаний, экспозиций полно.
-Когда был основан музей этот славный,
-В каком году двери свои он открыл?`,
-    answer: '1968',
-    hint: 'Ищи на табличке у входа. Это XX век. Ответ — четырёхзначное число.',
+    location: 'Старый городской парк',
+    riddle: `Тут слышен шёпот воды меж ветвей,
+И тень фонаря укажет путь скорей.
+Скажи не «где», а «как зовут» струю:
+Имя реки у парка — назови её.`,
+    answer: 'ошмянка',
+    hint: 'Название реки можно увидеть на табличках/картах или спросить у местных. Пиши без кавычек.',
     coordinates: { lat: 54.4149, lng: 25.9333 }
   },
   {
     id: 7,
-    location: 'Старый городской парк',
-    riddle: `В парке старинном, где деревья шумят,
-Четыре аллеи сходятся в круг.
-Какое дерево — символ сего места,
-Что здесь растёт, символизируя покой?`,
-    answer: 'берёза',
-    hint: 'Ищи на информационном стенде. Это лиственное дерево. Ответ — название дерева.',
-    coordinates: { lat: 54.4149, lng: 25.9333 }
+    location: 'Руины францисканцев',
+    riddle: `В камне — дыхание, в пустоте — ответ,
+Здесь век говорит, но не шепчет — звенит.
+Собери ключи и замок запри:
+Какое слово хранит здесь «алтарный» щит?`,
+    answer: 'печать',
+    hint: 'Это финальное слово-пароль. Оно связано с сюжетом квеста и тем, что ты собираешь по частям.',
+    coordinates: { lat: 54.4259, lng: 25.9564 }
   }
 ]
 
@@ -234,12 +235,15 @@ export default function Chatbot() {
     
     const selectedTour = localStorage.getItem('selectedTour')
     const isSapiegaTour = selectedTour === 'sapieha-seal'
+
+    const tour = getTourById(selectedTour || '') || getDefaultTour()
+    const tourPlaceOrder = tour.places
     
     // Инициализируем прогресс бота
     const initialBotProgress = {
       currentStage: 1,
       collectedCode: [],
-      unlockedMarkers: isSapiegaTour ? ['9'] : ['1'] // Первая локация зависит от тура
+      unlockedMarkers: [tourPlaceOrder[0]]
     }
     localStorage.setItem(`${selectedTour}-botProgress`, JSON.stringify(initialBotProgress))
     
@@ -252,11 +256,13 @@ export default function Chatbot() {
 Твоя цель — собрать 6 фрагментов Печати Сапег. Только тогда ты познаешь истину этого края.
 
 Первая точка — резиденция "Черного замка". Отправляйся в Гольшаны. Как будешь на месте, нажми "Я на месте".`
-      : `🏛️ Добро пожаловать в тур по Ошмянам! Ты отправишься в путешествие по историческому центру города.
+      : `🏛️ Добро пожаловать в квест «Печать Ошмянского магистрата»!
 
-Твоя цель — открыть 7 тайн Ошмян. Каждая локация хранит частичку истории.
+Ты — молодой архивариус: в старых бумагах ты нашёл карту XVII века. На ней говорится, что городская печать, дарующая «право на процветание», была спрятана во времена войн.
 
-Первая точка — величественный Костёл Святого Михаила. Отправляйся к нему. Как будешь на месте, нажми "Я на месте".`
+Твоя цель — собрать 7 цифровых ключей. Каждый ключ откроет следующую точку.
+
+Первая точка — Центральная площадь. Как будешь на месте, нажми "Я на месте".`
     
     addMessage(introText)
 
@@ -286,21 +292,21 @@ ${targetStage.riddle}`
     const normalizedCorrectAnswer = targetStage.answer.toLowerCase()
 
     if (normalizedUserAnswer === normalizedCorrectAnswer) {
-      // Генерируем кодовый фрагмент в зависимости от тура и этапа
-      const codeFragment = isSapiegaTour 
+      // Генерируем кодовый фрагмент
+      const codeFragment = isSapiegaTour
         ? (currentStage === 1 ? '2' :
            currentStage === 2 ? 'С' :
            currentStage === 3 ? '3' :
            currentStage === 4 ? '8' :
            currentStage === 5 ? 'Арка' :
            currentStage === 6 ? 'Утешительница' : '')
-        : (currentStage === 1 ? '1906' :
-           currentStage === 2 ? '19' :
-           currentStage === 3 ? '17' :
-           currentStage === 4 ? '1387' :
-           currentStage === 5 ? '5' :
-           currentStage === 6 ? '1968' :
-           currentStage === 7 ? 'берёза' : '')
+        : (currentStage === 1 ? 'Ключ-1' :
+           currentStage === 2 ? 'Ключ-2' :
+           currentStage === 3 ? 'Ключ-3' :
+           currentStage === 4 ? 'Ключ-4' :
+           currentStage === 5 ? 'Ключ-5' :
+           currentStage === 6 ? 'Ключ-6' :
+           currentStage === 7 ? 'Ключ-7' : '')
 
       setCollectedCode(prev => [...prev, codeFragment])
 
@@ -309,7 +315,7 @@ ${targetStage.riddle}`
            currentStage === 2 ? `Запомни первую букву — ${codeFragment}` :
            currentStage === 6 ? `Последнее слово — ${codeFragment}` :
            `Фрагмент кода: ${codeFragment}`)
-        : `Фрагмент истории: ${codeFragment}`
+        : `Цифровой ключ получен: ${codeFragment}`
 
       addMessage(`🎉 Верно! ${fragmentMessage}`, true, 'success')
 
@@ -321,12 +327,14 @@ ${targetStage.riddle}`
           setCurrentStage(currentStage + 1)
           
           // Сохраняем прогресс бота для синхронизации с маркерами
+          const tour = getTourById(selectedTour || '') || getDefaultTour()
+          const tourPlaceOrder = tour.places
+
           const botProgress = {
             currentStage: currentStage + 1,
             collectedCode,
-            unlockedMarkers: isSapiegaTour 
-              ? Array.from({ length: currentStage + 1 }, (_, i) => (9 + i).toString())
-              : Array.from({ length: currentStage + 1 }, (_, i) => (1 + i).toString())
+            unlockedMarkers: tourPlaceOrder.slice(0, currentStage + 1),
+            newlyUnlocked: tourPlaceOrder[currentStage] || null,
           }
           localStorage.setItem(`${selectedTour}-botProgress`, JSON.stringify(botProgress))
           
@@ -342,11 +350,11 @@ ${targetStage.riddle}`
 Твой итоговый код: ${finalCode}
 
 Ты прошел путь настоящего краеведа. Покажи этот код организатору квеста, чтобы получить свой заслуженный артефакт! 🎁`
-          : `🏆 ПОЗДРАВЛЯЮ! Ты открыл все тайны Ошмян!
+          : `🏆 ПОЗДРАВЛЯЮ! Печать Ошмянского магистрата восстановлена!
 
-Твоя коллекция знаний: ${finalCode}
+Твои ключи: ${finalCode}
 
-Ты стал настоящим знатоком истории Ошмян. Покажи эту информацию организатору квеста! 🎁`
+Ты собрал(а) 7 цифровых ключей и открыл(а) финальную тайну города. Покажи этот код организатору квеста! 🎁`
         
         addMessage(completionMessage, true, 'success')
         
@@ -354,9 +362,8 @@ ${targetStage.riddle}`
         const botProgress = {
           currentStage: totalStages + 1,
           collectedCode,
-          unlockedMarkers: isSapiegaTour 
-            ? Array.from({ length: questStages.length }, (_, i) => (9 + i).toString())
-            : Array.from({ length: questStagesOshmyany.length }, (_, i) => (1 + i).toString())
+          unlockedMarkers: (getTourById(selectedTour || '') || getDefaultTour()).places,
+          newlyUnlocked: null,
         }
         localStorage.setItem(`${selectedTour}-botProgress`, JSON.stringify(botProgress))
       }
