@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { places } from '../data/places'
 import '../styles/home.css'
 
 type Progress = {
@@ -19,26 +18,51 @@ export default function HomePage() {
 
   useEffect(() => {
     setIsLoaded(true)
-    const raw = localStorage.getItem('questProgress')
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as Progress
-        setProgress({
-          unlocked: parsed.unlocked || ['1'],
-          completed: parsed.completed || [],
-          attempts: parsed.attempts || {},
-          currentTaskIndex: parsed.currentTaskIndex || {},
-        })
-      } catch {
-        // ignore
-      }
-    }
 
     const savedName = localStorage.getItem('userName')
     if (savedName) {
       setUserName(savedName)
       setNameSaved(true)
     }
+
+    // Считываем прогресс из botProgress для обоих туров
+    const sapiehaProgressRaw = localStorage.getItem('sapieha-seal-botProgress')
+    const oshmyanyProgressRaw = localStorage.getItem('oshmyany-city-botProgress')
+
+    let totalCompleted = 0
+    let totalUnlocked = 0
+    let totalStages = 0
+
+    if (sapiehaProgressRaw) {
+      try {
+        const parsed = JSON.parse(sapiehaProgressRaw) as { currentStage?: number; collectedCode?: string[] }
+        const stage = parsed.currentStage || 0
+        totalCompleted += Math.max(0, stage - 1) // количество выполненных этапов
+        totalUnlocked += Math.min(stage, 6) // количество разблокированных маркеров
+        totalStages += 6
+      } catch {
+        // ignore
+      }
+    }
+
+    if (oshmyanyProgressRaw) {
+      try {
+        const parsed = JSON.parse(oshmyanyProgressRaw) as { currentStage?: number; collectedCode?: string[] }
+        const stage = parsed.currentStage || 0
+        totalCompleted += Math.max(0, stage - 1)
+        totalUnlocked += Math.min(stage, 7)
+        totalStages += 7
+      } catch {
+        // ignore
+      }
+    }
+
+    setProgress({
+      unlocked: Array.from({ length: totalUnlocked }, (_, i) => (i + 1).toString()),
+      completed: Array.from({ length: totalCompleted }, (_, i) => (i + 1).toString()),
+      attempts: {},
+      currentTaskIndex: {},
+    })
   }, [])
 
   const handleStart = () => {
@@ -53,7 +77,7 @@ export default function HomePage() {
   }
 
   const completedCount = progress.completed.length
-  const totalPlaces = places.length
+  const totalPlaces = 13 // 6 этапов Сапег + 7 этапов Ошмян
   const unlockedCount = progress.unlocked.length
   const progressPercent = Math.round((completedCount / totalPlaces) * 100)
 
